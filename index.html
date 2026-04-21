@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Massa Estrema & Postura 3D</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --container-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-color: #4CAF50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --drop-color: #e91e63;
+            --border-color: #333;
+            --completed-color: #888;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; margin: 0; padding: 20px; }
+        .container { max-width: 950px; margin: 0 auto; }
+        h1, h2, h3 { color: var(--accent-color); }
+        h4 { color: var(--warning-color); margin-bottom: 5px; }
+        .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
+        .tab-btn { background-color: var(--container-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 10px 15px; cursor: pointer; border-radius: 5px; font-size: 15px; font-weight: bold; transition: all 0.3s; }
+        .tab-btn.active, .tab-btn:hover { background-color: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+        .tab-btn.special { background-color: #2c3e50; border-color: #34495e; }
+        .tab-btn.special.active, .tab-btn.special:hover { background-color: var(--warning-color); }
+        .day-content { display: none; background-color: var(--container-bg); padding: 25px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .day-content.active { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .checklist-item { display: flex; align-items: flex-start; margin-bottom: 12px; padding: 12px; background-color: #2a2a2a; border-radius: 6px; border-left: 4px solid var(--accent-color); transition: opacity 0.3s; }
+        .checklist-item.rest { border-left-color: #2196F3; }
+        .checklist-item.nutrition { border-left-color: #e91e63; }
+        .checklist-item input[type="checkbox"] { margin-top: 5px; margin-right: 15px; transform: scale(1.4); cursor: pointer; }
+        .checklist-item label { cursor: pointer; flex: 1; }
+        .completed label { text-decoration: line-through; color: var(--completed-color); }
+        
+        .table-responsive { overflow-x: auto; margin-top: 15px; margin-bottom: 25px; }
+        table { width: 100%; border-collapse: collapse; background-color: #252525; min-width: 600px;}
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+        th { background-color: #333; color: var(--accent-color); font-weight: bold; }
+        .warmup-table { min-width: 100%; }
+        .warmup-table th { background-color: #422a14; color: var(--warning-color); }
+        
+        .note { font-size: 0.9em; color: #aaa; font-style: italic; }
+        .science-box { background-color: #1a2a3a; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #2196F3; }
+        .new-exercise { color: #81c784; font-weight: bold; }
+        .tag-rir0 { background-color: var(--danger-color); color: white; font-size: 0.8em; padding: 2px 6px; border-radius: 4px; font-weight: bold; display: inline-block; margin-top: 4px;}
+        .tag-drop { background-color: var(--drop-color); color: white; font-size: 0.8em; padding: 2px 6px; border-radius: 4px; font-weight: bold; display: inline-block; margin-top: 4px;}
+        .reset-box { background-color: #2e1a36; padding: 10px; border-radius: 6px; border-left: 4px solid #9c27b0; margin-top: 15px; margin-bottom: 15px;}
+        
+        /* Nuovi Stili per Tracciamento */
+        .track-input { width: 100%; box-sizing: border-box; padding: 10px; background-color: #121212; border: 1px solid var(--accent-color); color: #fff; border-radius: 4px; font-size: 14px; }
+        .track-input:focus { outline: none; border-color: #81c784; box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); }
+        .copy-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 15px; margin-top: 20px; background-color: #2196F3; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .copy-btn:hover { background-color: #0b7dda; transform: translateY(-2px); }
+        .copy-btn:active { transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🧬 Sistema Massa Estrema & Postura 3D</h1>
+    <p>Target: Giugno/Luglio. Focus su volume muscolare, tracciamento carichi e nutrizione anabolica.</p>
+
+    <div class="tabs">
+        <button class="tab-btn special active" onclick="showDay('guida')">📚 Protocolli Chiave</button>
+        <button class="tab-btn" onclick="showDay('lunedi')">Lunedì</button>
+        <button class="tab-btn" onclick="showDay('martedi')">Martedì</button>
+        <button class="tab-btn" onclick="showDay('mercoledi')">Mercoledì</button>
+        <button class="tab-btn" onclick="showDay('giovedi')">Giovedi</button>
+        <button class="tab-btn" onclick="showDay('venerdi')">Venerdì</button>
+        <button class="tab-btn" onclick="showDay('sabato')">Sabato</button>
+        <button class="tab-btn" onclick="showDay('domenica')">Domenica</button>
+    </div>
+
+    <div id="guida" class="day-content active">
+        <h2>📚 Le Regole del Gioco</h2>
+        
+        <div class="science-box">
+            <h3>🥩 1. Lean Bulk & Quota Proteica</h3>
+            <p>Obiettivo giornaliero: circa <strong>2600-2800 kcal</strong> nei giorni di allenamento. Tassativi <strong>160-170g di proteine al giorno</strong>. Lo spuntino delle 16:00 (Tonno o Skyr) è vitale.</p>
+        </div>
+
+        <div class="science-box">
+            <h3>🔥 2. Addome 3D & Correzione Posturale</h3>
+            <ul>
+                <li><strong>Rib Flare:</strong> Arrotola la colonna sui <em>Cable Crunches</em>. Ispessisci il retto addominale.</li>
+                <li><strong>Finta Pancetta:</strong> Applica il <em>Glute Squeeze</em> durante il giorno per forzare il bacino indietro (Posterior Pelvic Tilt).</li>
+            </ul>
+        </div>
+
+        <div class="science-box">
+            <h3>📈 3. Come usare il Tracker</h3>
+            <p>Sotto ogni esercizio hai una casella. Scrivi i pesi liberi (es: "16kg x 10, 8, 8"). A fine allenamento, premi il pulsante blu in fondo. Il sistema copierà tutto, e potrai incollarlo nelle tue Note per battere i record la settimana dopo.</p>
+        </div>
+    </div>
+
+    <div id="lunedi" class="day-content">
+        <h2>Lunedì: Schiena, Addome Profondo e Trapezi</h2>
+        <div class="checklist-item nutrition"><input type="checkbox" onchange="toggleCheck(this)"><label><strong>Proteine:</strong> Spuntino strategico ore 16:00 inserito (Tonno/Skyr).</label></div>
+        <div class="checklist-item"><input type="checkbox" onchange="toggleCheck(this)"><label>Nutrizione: Surplus calorico totale. Collagene pre-workout.</label></div>
+
+        <h4>🔥 Riscaldamento Cuffia</h4>
+        <div class="table-responsive">
+            <table class="warmup-table">
+                <tr><th>Esercizio</th><th>Rip / Tempo</th></tr>
+                <tr><td>Isometria Extrarotazione elastico</td><td>30-45 sec/braccio</td></tr>
+                <tr><td>Band Pull-Aparts</td><td>15 lente</td></tr>
+                <tr><td>Scapular Push-Ups</td><td>10-12</td></tr>
+            </table>
+        </div>
+        
+        <h3>Allenamento Massa</h3>
+        <div class="table-responsive">
+            <table>
+                <tr><th>Esercizio</th><th>Serie x Rip</th><th>Note</th><th>Tracciamento (Kg x Rip)</th></tr>
+                <tr><td>Lat Machine (presa neutra)</td><td>4 x 8-10</td><td>RIR 1-2. Massima estensione.</td><td><input type="text" class="track-input" placeholder="Es. 50kg: 10,9,8,8"></td></tr>
+                <tr><td>Rematore manubri panca inclinata</td><td>4 x 10-12</td><td>RIR 1-2. Stringi scapole.</td><td><input type="text" class="track-input" placeholder="Es. 16kg: 12,10,10..."></td></tr>
+                <tr><td>Pullover con manubrio</td><td>3 x 10-12</td><td>RIR 1. Allarga torace.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Face Pulls al cavo</td><td>4 x 15</td><td><span class="tag-rir0">RIR 0</span>.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Scrollate (Shrugs) manubri</td><td>3 x 12-15</td><td><span class="tag-drop">DROP SET</span>.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Spider Curls (Panca inclinata)</td><td>3 x 12-15</td><td><span class="tag-drop">DROP SET</span>.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Cable Crunches (Addome cavo alto)</td><td>3 x 12-15</td><td>Carico pesante. Arrotola schiena.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+            </table>
+        </div>
+        
+        <div class="reset-box">
+            <div class="checklist-item"><input type="checkbox" onchange="toggleCheck(this)"><label><strong>Reset 3 Min:</strong> Petto muro, Couch Stretch, Respirazione.</label></div>
+        </div>
+        <button class="copy-btn" onclick="copyWorkoutData('lunedi')">📋 Copia Pesi Allenamento</button>
+    </div>
+
+    <div id="martedi" class="day-content">
+        <h2>Martedì: Gambe e Core Inferiore</h2>
+        <div class="checklist-item nutrition"><input type="checkbox" onchange="toggleCheck(this)"><label><strong>Proteine:</strong> Spuntino strategico ore 16:00 inserito.</label></div>
+        <div class="checklist-item"><input type="checkbox" onchange="toggleCheck(this)"><label>Lavoro: Couch stretch + <em>Glute Squeeze</em> durante il giorno.</label></div>
+
+        <h3>Allenamento Massa</h3>
+        <div class="table-responsive">
+            <table>
+                <tr><th>Esercizio</th><th>Serie x Rip</th><th>Note</th><th>Tracciamento (Kg x Rip)</th></tr>
+                <tr><td>Stacchi Rumeni (RDL)</td><td>4 x 8-10</td><td>RIR 1-2. Senti i femorali.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Hip Thrust (Spinte bacino)</td><td>4 x 10-12</td><td>RIR 1.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Leg Press</td><td>3 x 10-12</td><td>RIR 1. Piedi alti e larghi.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Leg Extension (HSR)</td><td>4 x 15</td><td>Lentissimo. <span class="tag-drop">DROP SET</span>.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Leg Curl</td><td>3 x 12</td><td><span class="tag-rir0">CEDIMENTO</span>.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Calf Raises (Polpacci)</td><td>4 x 15-20</td><td><span class="tag-drop">DROP SET</span>.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Hanging Leg Raises</td><td>3 x Max</td><td>Sblocca il bacino.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+            </table>
+        </div>
+        
+        <div class="reset-box">
+            <div class="checklist-item"><input type="checkbox" onchange="toggleCheck(this)"><label><strong>Reset 3 Min:</strong> Petto muro, Couch Stretch, Respirazione.</label></div>
+        </div>
+        <button class="copy-btn" onclick="copyWorkoutData('martedi')">📋 Copia Pesi Allenamento</button>
+    </div>
+
+    <div id="mercoledi" class="day-content">
+        <h2>Mercoledì: Recupero Attivo (Crescita)</h2>
+        <div class="checklist-item nutrition"><input type="checkbox" onchange="toggleCheck(this)"><label><strong>Proteine:</strong> Mantieni l'apporto alto anche oggi.</label></div>
+        <div class="checklist-item"><input type="checkbox" onchange="toggleCheck(this)"><label>Camminata all'aperto (30-45 min).</label></div>
+        <div class="checklist-item"><input type="checkbox" onchange="toggleCheck(this)"><label>Stretching profondo (15 min) per anche e psoas.</label></div>
+        <div class="checklist-item rest"><input type="checkbox" onchange="toggleCheck(this)"><label>NSDR (20 min) + Magnesio serale.</label></div>
+    </div>
+
+    <div id="giovedi" class="day-content">
+        <h2>Giovedì: Petto Alto, Spalle e Braccia</h2>
+        <div class="checklist-item nutrition"><input type="checkbox" onchange="toggleCheck(this)"><label><strong>Proteine:</strong> Spuntino strategico ore 16:00 inserito.</label></div>
+
+        <h4>🔥 Riscaldamento Cuffia</h4>
+        <div class="table-responsive">
+            <table class="warmup-table">
+                <tr><th>Esercizio</th><th>Rip / Tempo</th></tr>
+                <tr><td>Isometria Extrarotazione</td><td>30-45 sec/braccio</td></tr>
+                <tr><td>Band Pull-Aparts</td><td>15 lente</td></tr>
+                <tr><td>Scapular Push-Ups</td><td>10-12</td></tr>
+            </table>
+        </div>
+
+        <h3>Allenamento Massa</h3>
+        <div class="table-responsive">
+            <table>
+                <tr><th>Esercizio</th><th>Serie x Rip</th><th>Note</th><th>Tracciamento (Kg x Rip)</th></tr>
+                <tr><td>Dumbbell Floor Press</td><td>4 x 8-10</td><td>RIR 1-2.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Spinte Panca Inclinata a 30°</td><td>3 x 10-12</td><td>Presa neutra. Riempie torace.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Alzate laterali cavi/manubri</td><td>4 x 12-15</td><td><span class="tag-drop">DROP SET</span>.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Hammer Curls</td><td>3 x 10-12</td><td><span class="tag-rir0">CEDIMENTO</span>.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Preacher Curls</td><td>3 x 12-15</td><td><span class="tag-drop">DROP SET</span>.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Pushdown tricipiti</td><td>3 x 12-15</td><td><span class="tag-rir0">CEDIMENTO</span>.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Estensioni tricipiti dietro nuca</td><td>3 x 10-12</td><td><span class="tag-drop">DROP SET</span>.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+            </table>
+        </div>
+
+        <div class="reset-box">
+            <div class="checklist-item"><input type="checkbox" onchange="toggleCheck(this)"><label><strong>Reset 3 Min:</strong> Petto muro, Couch Stretch, Respirazione.</label></div>
+        </div>
+        <button class="copy-btn" onclick="copyWorkoutData('giovedi')">📋 Copia Pesi Allenamento</button>
+    </div>
+
+    <div id="venerdi" class="day-content">
+        <h2>Venerdì: Schiena, Gambe e Delt. Post.</h2>
+        <div class="checklist-item nutrition"><input type="checkbox" onchange="toggleCheck(this)"><label><strong>Proteine:</strong> Spuntino strategico ore 16:00 inserito.</label></div>
+
+        <h3>Allenamento Massa</h3>
+        <div class="table-responsive">
+            <table>
+                <tr><th>Esercizio</th><th>Serie x Rip</th><th>Note</th><th>Tracciamento (Kg x Rip)</th></tr>
+                <tr><td>Ring Rows o Pulley</td><td>4 x 10-12</td><td>RIR 1.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Lat Pulldown braccia tese</td><td>3 x 12-15</td><td><span class="tag-drop">DROP SET</span>.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Croci Inverse (Rear Delt)</td><td>3 x 15</td><td><span class="tag-rir0">CEDIMENTO</span>.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Affondi indietro</td><td>3 x 10/gamba</td><td>RIR 1-2.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Leg Curl (Richiamo)</td><td>3 x 12-15</td><td><span class="tag-rir0">CEDIMENTO</span>.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+                <tr><td>Band Pull-Aparts</td><td>3 x 20</td><td>RIR 1.</td><td><input type="text" class="track-input" placeholder="..."></td></tr>
+            </table>
+        </div>
+
+        <div class="reset-box">
+            <div class="checklist-item"><input type="checkbox" onchange="toggleCheck(this)"><label><strong>Reset 3 Min:</strong> Petto muro, Couch Stretch, Respirazione.</label></div>
+        </div>
+        <button class="copy-btn" onclick="copyWorkoutData('venerdi')">📋 Copia Pesi Allenamento</button>
+    </div>
+
+    <div id="sabato" class="day-content">
+        <h2>Sabato: Calisthenics & Braccia a casa</h2>
+        <div class="checklist-item nutrition"><input type="checkbox" onchange="toggleCheck(this)"><label><strong>Proteine:</strong> Focus fonti alternative.</label></div>
+
+        <h3>Allenamento Massa</h3>
+        <div class="table-responsive">
+            <table>
+                <tr><th>Esercizio</th><th>Serie x Rip</th><th>Note</th><th>Tracciamento (Kg x Rip)</th></tr>
+                <tr><td>Support Hold (Anelli)</td><td>4 x Max sec</td><td>Rinforzo tendineo.</td><td><input type="text" class="track-input" placeholder="Secondi..."></td></tr>
+                <tr><td>Push-ups</td><td>3 x Max</td><td><span class="tag-rir0">CEDIMENTO</span>.</td><td><input type="text" class="track-input" placeholder="Ripetizioni..."></td></tr>
+                <tr><td>Pike Push-Ups</td><td>3 x Max</td><td><span class="tag-rir0">CEDIMENTO</span>.</td><td><input type="text" class="track-input" placeholder="Ripetizioni..."></td></tr>
+                <tr><td>Trazioni Orizzontali</td><td>3 x Max</td><td><span class="tag-rir0">CEDIMENTO</span>.</td><td><input type="text" class="track-input" placeholder="Ripetizioni..."></td></tr>
+                <tr><td>Biceps Curl elastico</td><td>3 x 15-20</td><td><span class="tag-drop">DROP SET</span>.</td><td><input type="text" class="track-input" placeholder="Resistenza..."></td></tr>
+                <tr><td>Triceps Ext. elastico</td><td>3 x 15-20</td><td><span class="tag-drop">DROP SET</span>.</td><td><input type="text" class="track-input" placeholder="Resistenza..."></td></tr>
+            </table>
+        </div>
+        <button class="copy-btn" onclick="copyWorkoutData('sabato')">📋 Copia Pesi Allenamento</button>
+    </div>
+
+    <div id="domenica" class="day-content">
+        <h2>Domenica: Ricarica e Riparazione</h2>
+        <div class="checklist-item rest"><input type="checkbox" onchange="toggleCheck(this)"><label>Mangia abbondante ma pulito. Niente allenamento.</label></div>
+        <div class="checklist-item nutrition"><input type="checkbox" onchange="toggleCheck(this)"><label>Proteine garantite a pranzo e cena.</label></div>
+        <div class="checklist-item rest"><input type="checkbox" onchange="toggleCheck(this)"><label>NSDR profondo. Magnesio prima di dormire.</label></div>
+    </div>
+
+</div>
+
+<script>
+    function showDay(dayId) {
+        document.querySelectorAll('.day-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(dayId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function toggleCheck(checkbox) {
+        const item = checkbox.closest('.checklist-item');
+        if (checkbox.checked) { item.classList.add('completed'); } 
+        else { item.classList.remove('completed'); }
+    }
+
+    function copyWorkoutData(dayId) {
+        const container = document.getElementById(dayId);
+        const title = container.querySelector('h2').innerText;
+        let dataToCopy = "📅 " + title + "\n\n";
+        let hasData = false;
+
+        const rows = container.querySelectorAll('tr');
+        rows.forEach(row => {
+            const input = row.querySelector('.track-input');
+            if (input && input.value.trim() !== '') {
+                hasData = true;
+                const exerciseName = row.cells[0].innerText.split('\n')[0];
+                dataToCopy += `• ${exerciseName}: ${input.value}\n`;
+            }
+        });w
+
+        if (!hasData) {
+            alert("Non hai scritto nessun peso da copiare!");
+            return;
+        }
+
+        navigator.clipboard.writeText(dataToCopy).then(() => {
+            const btn = container.querySelector('.copy-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "✅ Dati copiati con successo!";
+            btn.style.backgroundColor = "#4CAF50";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.backgroundColor = "#2196F3";
+            }, 3000);
+        }).catch(err => {
+            alert("Errore durante la copia dei dati: " + err);
+        });
+    }
+</script>
+
+</body>
+</html>
